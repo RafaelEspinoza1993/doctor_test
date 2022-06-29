@@ -10,7 +10,7 @@ async def parsecsv(file: UploadFile = File(...)):
     json_string = convertBytesToString(contents)
     for json in json_string:
         data = validacion(json, json['target id'])
-        result.append(data)
+        result.append(data['result'])
     return {
         "file_contents": result
     }
