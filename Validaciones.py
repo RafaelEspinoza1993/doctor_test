@@ -87,6 +87,8 @@ ebola = {
     },
 }
 
+
+
 def TransformSTRtoFLOAT(data):
     return {
         'ct' : 0 if data['ct'] == 'Undetermined' else float(data['ct']),
@@ -108,35 +110,14 @@ def validacionViruela(data, text):
         'result': '',
         'comment': ''
     }
-
-
     statusEnfermedad = {
-        'viruela': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'sarampeon': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'covid': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'ebola': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        }
+        'status':0,
+        'ct':0,
+        'amp':0,
+        'cq':0
     }
-    if data['ct'] > float(viruelaHighCTsplit[0]) or data['ct'] > float(viruelaHighCTsplit[1]) or data['amp'] > viruela['high']['amp'] or data['cq'] > viruela['high']['cq']:
+
+    if data['ct'] < float(viruelaHighCTsplit[0]) or data['ct'] < float(viruelaHighCTsplit[1]) or data['amp'] > viruela['high']['amp'] or data['cq'] > viruela['high']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -144,7 +125,12 @@ def validacionViruela(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'high'
-    elif data['ct'] > float(viruelaMediumCTsplit[0]) or data['ct'] > float(viruelaMediumCTsplit[1]) or data['amp'] > viruela['medium']['amp'] or data['cq'] > viruela['medium']['cq']:
+        statusEnfermedad = {
+            'ct': 1 if data['ct'] < float(viruelaHighCTsplit[0]) or data['ct'] < float(viruelaHighCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > viruela['high']['amp'] else 0,
+            'cq':1 if data['cq'] > viruela['high']['cq'] else 0
+        }
+    elif data['ct'] < float(viruelaMediumCTsplit[0]) or data['ct'] < float(viruelaMediumCTsplit[1]) or data['amp'] > viruela['medium']['amp'] or data['cq'] > viruela['medium']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -152,7 +138,12 @@ def validacionViruela(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'medium'
-    elif data['ct'] > float(viruelaLowCTsplit[0]) or data['ct'] > float(viruelaLowCTsplit[1]) or data['amp'] > viruela['low']['amp'] or data['cq'] > viruela['low']['cq']:
+        statusEnfermedad = {
+                'ct': 1 if data['ct'] < float(viruelaMediumCTsplit[0]) or data['ct'] < float(viruelaMediumCTsplit[1]) else 0,
+                'amp':1 if data['amp'] > viruela['medium']['amp'] else 0,
+                'cq':1 if data['cq'] > viruela['medium']['cq'] else 0
+        }
+    elif data['ct'] < float(viruelaLowCTsplit[0]) or data['ct'] < float(viruelaLowCTsplit[1]) or data['amp'] > viruela['low']['amp'] or data['cq'] > viruela['low']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -160,6 +151,11 @@ def validacionViruela(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'low'
+        statusEnfermedad = {
+                'ct': 1 if data['ct'] < float(viruelaLowCTsplit[0]) or data['ct'] < float(viruelaLowCTsplit[1]) else 0,
+                'amp':1 if data['amp'] > viruela['low']['amp'] else 0,
+                'cq':1 if data['cq'] > viruela['low']['cq'] else 0
+        }
     else:
         result['well'] = text['well']
         result['target id'] = text['target id']
@@ -168,6 +164,12 @@ def validacionViruela(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'no range'
+        statusEnfermedad = {
+                'ct': 0,
+                'amp':0,
+                'cq':0
+        }
+    statusEnfermedad['status'] = 1 if statusEnfermedad['amp'] == 1 and statusEnfermedad['ct'] == 1  or statusEnfermedad['amp'] == 1 and statusEnfermedad['cq'] == 1 or statusEnfermedad['cq'] == 1  and statusEnfermedad['ct'] == 1 else 0
     return {
         'result': result,
         'status': statusEnfermedad
@@ -186,33 +188,14 @@ def validacionSarampeon(data, text):
         'comment': ''
     }
 
-
+    
     statusEnfermedad = {
-        'viruela': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'sarampeon': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'covid': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'ebola': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        }
+        'status':0,
+        'ct':0,
+        'amp':0,
+        'cq':0
     }
+
     if data['amp'] > sarampeon['high']['amp'] or data['cq'] > sarampeon['high']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
@@ -221,6 +204,12 @@ def validacionSarampeon(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'high'
+        statusEnfermedad = {
+            'status':1,
+            'ct': 0,
+            'amp':1 if data['amp'] > sarampeon['high']['amp'] else 0,
+            'cq':1 if data['cq'] > sarampeon['high']['cq'] else 0
+        }
     elif data['amp'] > sarampeon['medium']['amp'] or data['cq'] > sarampeon['medium']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
@@ -229,6 +218,12 @@ def validacionSarampeon(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'medium'
+        statusEnfermedad = {
+            'status':1,
+            'ct': 0,
+            'amp':1 if data['amp'] > sarampeon['medium']['amp'] else 0,
+            'cq':1 if data['cq'] > sarampeon['medium']['cq'] else 0
+        }
     elif data['amp'] > sarampeon['low']['amp'] or data['cq'] > sarampeon['low']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
@@ -237,7 +232,13 @@ def validacionSarampeon(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'low'
-    elif data['ct'] > float(sarampeonNoRangeCTsplit[0]) or data['ct'] > float(sarampeonNoRangeCTsplit[1]) or data['amp'] > sarampeon['no_range']['amp'] or data['cq'] > sarampeon['no_range']['cq']:
+        statusEnfermedad = {
+            'status':1,
+            'ct': 0,
+            'amp':1 if data['amp'] > sarampeon['low']['amp'] else 0,
+            'cq':1 if data['cq'] > sarampeon['low']['cq'] else 0
+        }
+    elif data['ct'] < float(sarampeonNoRangeCTsplit[0]) or data['ct'] < float(sarampeonNoRangeCTsplit[1]) or data['amp'] > sarampeon['no_range']['amp'] or data['cq'] > sarampeon['no_range']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -245,6 +246,13 @@ def validacionSarampeon(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'no range'
+        statusEnfermedad = {
+            'status':1,
+            'ct': 1 if data['ct'] < float(sarampeonNoRangeCTsplit[0]) or data['ct'] < float(sarampeonNoRangeCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > sarampeon['no_range']['amp'] else 0,
+            'cq':1 if data['cq'] > sarampeon['no_range']['cq'] else 0
+        }
+        
     return {
         'result': result,
         'status': statusEnfermedad
@@ -264,35 +272,14 @@ def validacionCovid(data, text):
         'result': '',
         'comment': ''
     }
-
-
     statusEnfermedad = {
-        'viruela': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'sarampeon': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'covid': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'ebola': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        }
+        'status':0,
+        'ct':0,
+        'amp':0,
+        'cq':0
     }
-    if data['ct'] > float(covidHighCTsplit[0]) or data['ct'] > float(covidHighCTsplit[1]) or data['amp'] > covid['high']['amp'] or data['cq'] > covid['high']['cq']:
+    
+    if data['ct'] < float(covidHighCTsplit[0]) or data['ct'] < float(covidHighCTsplit[1]) or data['amp'] > covid['high']['amp'] or data['cq'] > covid['high']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -300,7 +287,13 @@ def validacionCovid(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'high'
-    elif data['ct'] > float(covidMediumCTsplit[0]) or data['ct'] > float(covidMediumCTsplit[1]) or data['amp'] > covid['medium']['amp'] or data['cq'] > covid['medium']['cq']:
+        statusEnfermedad = {
+            'status':1,
+            'ct': 1 if data['ct'] < float(covidHighCTsplit[0]) or data['ct'] < float(covidHighCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > covid['high']['amp'] else 0,
+            'cq':1 if data['cq'] > covid['high']['cq'] else 0
+        }
+    elif data['ct'] < float(covidMediumCTsplit[0]) or data['ct'] < float(covidMediumCTsplit[1]) or data['amp'] > covid['medium']['amp'] or data['cq'] > covid['medium']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -308,7 +301,13 @@ def validacionCovid(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'medium'
-    elif data['ct'] > float(covidLowCTsplit[0]) or data['ct'] > float(covidLowCTsplit[1]) or data['amp'] > covid['low']['amp'] or data['cq'] > covid['low']['cq']:
+        statusEnfermedad = {
+            'status':1,
+            'ct': 1 if data['ct'] < float(covidMediumCTsplit[0]) or data['ct'] < float(covidMediumCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > covid['medium']['amp'] else 0,
+            'cq':1 if data['cq'] > covid['medium']['cq'] else 0
+        }
+    elif data['ct'] < float(covidLowCTsplit[0]) or data['ct'] < float(covidLowCTsplit[1]) or data['amp'] > covid['low']['amp'] or data['cq'] > covid['low']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -316,6 +315,12 @@ def validacionCovid(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'low'
+        statusEnfermedad = {
+            'status':1,
+            'ct': 1 if data['ct'] < float(covidLowCTsplit[0]) or data['ct'] < float(covidLowCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > covid['low']['amp'] else 0,
+            'cq':1 if data['cq'] > covid['low']['cq'] else 0
+        }
     else:
         result['well'] = text['well']
         result['target id'] = text['target id']
@@ -324,6 +329,12 @@ def validacionCovid(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'no range'
+        statusEnfermedad = {
+            'status':0,
+            'ct': 0,
+            'amp':0,
+            'cq': 0
+        }
     return {
         'result': result,
         'status': statusEnfermedad
@@ -343,34 +354,14 @@ def validacionEbola(data, text):
         'comment': ''
     }
 
-
     statusEnfermedad = {
-        'viruela': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'sarampeon': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'covid': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        },
-        'ebola': {
-            'status':0,
-            'ct':0,
-            'amp':0,
-            'cq':0
-        }
+        'status':0,
+        'ct':0,
+        'amp':0,
+        'cq':0
     }
-    if data['ct'] > float(ebolaHighCTsplit[0]) or data['ct'] > float(ebolaHighCTsplit[1]) or data['amp'] > covid['high']['amp'] or data['cq'] > covid['high']['cq']:
+
+    if data['ct'] < float(ebolaHighCTsplit[0]) or data['ct'] < float(ebolaHighCTsplit[1]) or data['amp'] > ebola['high']['amp'] or data['cq'] > ebola['high']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -378,7 +369,13 @@ def validacionEbola(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'high'
-    elif data['ct'] > float(ebolaMediumCTsplit[0]) or data['ct'] > float(ebolaMediumCTsplit[1]) or data['amp'] > covid['medium']['amp'] or data['cq'] > covid['medium']['cq']:
+        statusEnfermedad = {
+            'status':1,
+            'ct': 1 if data['ct'] < float(ebolaHighCTsplit[0]) or data['ct'] < float(ebolaHighCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > ebola['high']['amp'] else 0,
+            'cq':1 if data['cq'] > ebola['high']['cq'] else 0
+        }
+    elif data['ct'] < float(ebolaMediumCTsplit[0]) or data['ct'] < float(ebolaMediumCTsplit[1]) or data['amp'] > ebola['medium']['amp'] or data['cq'] > ebola['medium']['cq']:
         result['well'] = text['well']
         result['target id'] = text['target id']
         result['target name'] = text['target name']
@@ -386,6 +383,12 @@ def validacionEbola(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'medium'
+        statusEnfermedad = {
+            'status':1,
+            'ct': 1 if data['ct'] < float(ebolaMediumCTsplit[0]) or data['ct'] < float(ebolaMediumCTsplit[1]) else 0,
+            'amp':1 if data['amp'] > ebola['medium']['amp'] else 0,
+            'cq':1 if data['cq'] > ebola['medium']['cq'] else 0
+        }
     else:
         result['well'] = text['well']
         result['target id'] = text['target id']
@@ -394,6 +397,12 @@ def validacionEbola(data, text):
         result['amp'] = data['amp']
         result['cq'] = data['cq']
         result['comment'] = 'no range'
+        statusEnfermedad = {
+            'status':0,
+            'ct': 0,
+            'amp':0,
+            'cq': 0
+        }
     return {
         'result': result,
         'status': statusEnfermedad
@@ -403,11 +412,11 @@ def validacion(data, id):
     test = TransformSTRtoFLOAT(data)
     if 'org1':
         result= validacionViruela(test, data)
-    if 'org2':
+    elif 'org2':
         result = validacionSarampeon(test, data)
-    if 'org3':
+    elif 'org3':
         result = validacionCovid(test, data)
-    if 'org4':
+    elif 'org4':
         result = validacionEbola(test, data)
 
     return result
