@@ -410,13 +410,13 @@ def validacionEbola(data, text):
 
 def validacion(data, id):
     test = TransformSTRtoFLOAT(data)
-    if 'org1':
+    if 'org1' == id:
         result= validacionViruela(test, data)
-    elif 'org2':
+    elif 'org2' == id:
         result = validacionSarampeon(test, data)
-    elif 'org3':
+    elif 'org3' == id:
         result = validacionCovid(test, data)
-    elif 'org4':
+    elif 'org4' == id:
         result = validacionEbola(test, data)
 
     return result
